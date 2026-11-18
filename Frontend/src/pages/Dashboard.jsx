@@ -63,7 +63,7 @@ function Dashboard() {
       } catch (err) {
         if (isMounted) {
           console.error("Fetch Tasks Error:", err.response?.data || err);
-          setError(err.response?.data?.message || "Failed to fetch tasks!");
+          setError(err.response?.data?.message);
           setTasks([]);
         }
       } finally {

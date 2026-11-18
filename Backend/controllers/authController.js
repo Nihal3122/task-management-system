@@ -86,8 +86,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, "Email");
-    console.log(password, "Passoword");
 
     if (!email || !password) {
       return res.status(400).json({
@@ -102,27 +100,30 @@ const login = async (req, res) => {
       },
     });
 
+    // Check if user exists
     if (!user) {
-      return res.status(401).json({
-        message: "Invalid email or password",
+      return res.status(404).json({
+        message: "Account not found. Please register first.",
       });
     }
 
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
+    // Check password
     if (!isPasswordValid) {
       return res.status(401).json({
-        message: "Invalid email or password",
+        message: "Incorrect email or password.",
       });
     }
 
     // Generate JWT
     const token = generateToken(user.id);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       token,
+      userId: user.id,
       user: {
         id: user.id,
         name: user.name,
@@ -132,7 +133,7 @@ const login = async (req, res) => {
   } catch (error) {
     console.error("Login error:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Internal server error",
     });
   }

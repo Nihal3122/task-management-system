@@ -23,6 +23,7 @@ function Login() {
   };
 
   // Handle Login API
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -35,16 +36,24 @@ function Login() {
       // Store JWT Token
       localStorage.setItem("token", data.token);
 
-      // Store User ID if returned
+      // Store User ID
       if (data.userId) {
         localStorage.setItem("userId", data.userId);
       }
 
       toast.success("Login successful!");
-
       navigate("/dashboard");
     } catch (error) {
-      setError(error.response?.data?.message || "Invalid email or password");
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
+
+      if (status === 404) {
+        setError("Account not found. Please register first.");
+      } else if (status === 401) {
+        setError("Incorrect email or password.");
+      } else {
+        setError(message || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
